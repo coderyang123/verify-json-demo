@@ -20,14 +20,8 @@ fn main() {
     // 判断每个对象的字段是否包含null值
     check_null_values(&arr);
 
-    // 判断给定的key列表，判断哪些对象的字段是无法转换成int64的
-    let keys = vec![
-        "BJCLF", "BJJGF", "BJMLL", "BJSJ", "BZCB", "BZGS", "CHSL", "DGBZCB", "DPPSR", "FYZZ", "GS",
-        "GSSP", "JGFY", "JJRG", "KBETR", "KURSF", "LFIMG", "MENGE", "NETWR", "RD", "RGZZ", "SJCB",
-        "SJDJ", "SR", "YF", "YLDXL", "YLDZYQ", "YLFRS", "YLFZBZ", "YLGGL", "YLGJL", "YLHTL",
-        "YLPCBA", "YLQTZL", "YLSJL", "YLXJL", "YLYSPL", "YLYYL", "YLZBZL", "YLZZ", "ZJ", "ZJRG",
-        "ZZ", "ZZFY",
-    ];
+    // 判断给定的key列表，判断哪些对象的字段是无法转换成数值的
+    let keys = vec!["tempCode", "tempCode2"];
     check_invalid_values(&arr, keys);
 
     let duration = start.elapsed();
