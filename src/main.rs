@@ -6,15 +6,18 @@ use std::io::Read;
 use std::time::Instant;
 
 fn main() {
+    println!("开始读取JSON文件...");
     let start = Instant::now();
-    let path = "C://Users//141549//Downloads//a.json";
+    let path = "C://Users//141549//Downloads//data.json";
     let file = File::open(path).expect("无法打开文件");
+    let mut data = String::new();
     let mut reader = DecodeReaderBytesBuilder::new()
         .encoding(Some(UTF_8))
         .build(file);
-    let mut data = String::new();
     reader.read_to_string(&mut data).expect("读取文件失败");
+    println!("文件读取完成，开始解析JSON...");
     let json: Value = serde_json::from_str(&data).expect("解析JSON失败");
+    println!("JSON解析完成，开始检查数据...");
     let arr = json.as_array().expect("不是数组");
 
     // 判断每个对象的字段是否包含null值
@@ -24,8 +27,12 @@ fn main() {
     let keys = vec!["tempCode", "tempCode2"];
     check_invalid_values(&arr, keys);
 
+    // 判断给定的key列表，判断哪些对象的字段的值是重复的
+    let keys = vec!["tempCode", "tempCode2"];
+    check_duplicate_values(&arr, keys);
+
     let duration = start.elapsed();
-    println!("耗时: {:?}", duration);
+    println!("检查数据完成，总耗时仅为: {:?}，Amazing!!!", duration);
 }
 
 // 判断每个对象的字段是否包含null值
@@ -67,6 +74,29 @@ fn check_invalid_values(arr: &Vec<Value>, keys: Vec<&str>) {
                     println!("键：【{}】，值：【{}】", k, v);
                 }
             }
+        }
+    }
+}
+
+// 判断给定的key列表，遍历所有对象然后判断这个key对应的值是否重复
+fn check_duplicate_values(arr: &Vec<Value>, keys: Vec<&str>) {
+    let mut value_map: std::collections::HashMap<String, Vec<usize>> =
+        std::collections::HashMap::new();
+
+    for (i, obj) in arr.iter().enumerate() {
+        if let Some(map) = obj.as_object() {
+            for key in &keys {
+                if let Some(value) = map.get(*key) {
+                    let value_str = value.to_string();
+                    value_map.entry(value_str).or_default().push(i + 1); // 使用1-based index
+                }
+            }
+        }
+    }
+
+    for (value, indices) in value_map {
+        if indices.len() > 1 {
+            println!("值：【{}】在以下对象中重复：{:?}", value, indices);
         }
     }
 }
